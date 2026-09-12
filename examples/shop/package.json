@@ -1,0 +1,7 @@
+{
+  "name": "buggle-shop-fixture",
+  "private": true,
+  "description": "Repository evidence fixture for Buggle; no running web application is included.",
+  "scripts": { "test:e2e": "playwright test" },
+  "devDependencies": { "@playwright/test": "*" }
+}
