@@ -2,15 +2,16 @@
 
 Repository-aware AI assistance for maintaining web UI tests.
 
-**Version 0.1: runnable backend starter.** This implementation receives GitHub
+**Version 0.2: backend plus isolated-runner orchestration.** This implementation receives GitHub
 push events, reads the affected repository at the pushed commit, learns its
 Playwright conventions and stores a reviewable test proposal. The project
 repository is [Estherokafor05/buggle](https://github.com/Estherokafor05/buggle).
 
 The included automated checks and demo use local fixtures and mocked remote
 services. Live GitHub App authentication and live model output still need to be
-validated with deployment credentials. Browser execution and PR publication are
-the next development milestones. Every proposal explicitly records
+validated with deployment credentials. Browser execution now has a separate,
+injectable sandbox boundary; PR publication is the next development milestone.
+Every proposal created in the webhook process explicitly records
 `browserExecution: "not_run"` and `humanReviewRequired: true`.
 
 ## Run locally without credentials
@@ -51,6 +52,16 @@ npm run inspect -- /path/to/application
 | Run API | Authenticated list, detail and retry endpoints |
 | Usage control | Persistent hourly model call cap and one active worker |
 | CI | Type checking, automated tests and offline demo on pushes and PRs |
+| Browser runner | Run human-reviewed tests at head and, after a failure, at base; retain the Playwright report, traces, screenshots, retries and exit status |
+
+Browser execution is deliberately not called from the webhook/model worker. A
+deployment supplies the `RevisionSandbox`, which must create an ephemeral
+environment at the pinned revision, use reviewed install/test commands and a
+commit-specific preview URL, and must not inherit model credentials or repository
+write tokens. A head-only pass is `passed`; a head failure that passes at base is
+`application_failure`; the same failure at both revisions is `outdated_tests`;
+missing comparison evidence is `inconclusive`; and provisioning failures are
+`environment_failure`.
 
 ## Start a configured service
 
@@ -84,7 +95,7 @@ See [Operations](docs/OPERATIONS.md) for endpoints and operational limits,
 Locally verified on 12 September 2026 with Node 24.19.0:
 
 - TypeScript check passed.
-- 23 automated tests passed, including an HTTP webhook-to-result integration test.
+- 28 automated tests passed, including runner classification and an HTTP webhook-to-result integration test.
 - Offline demo completed and produced a proposal marked as unexecuted.
 - Sample repository inspection identified its Playwright conventions.
 

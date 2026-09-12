@@ -20,7 +20,7 @@ Acceptance: a real signed push produces a grounded proposal tied to the exact
 commit; duplicate and stale deliveries are handled correctly; missing
 requirements remain visible. Record provider usage and end-to-end latency.
 
-## 3. Execute generated tests in isolation
+## 3. Execute generated tests in isolation (orchestration implemented)
 
 Build an ephemeral runner for the application's pinned revision and proposed
 test files. Use reviewed install/test commands, a commit-specific preview URL
@@ -32,6 +32,12 @@ failure, test failure and inconclusive results.
 Acceptance: a known passing journey runs successfully and a seeded application
 regression fails without the agent weakening the expected result. Reports
 record precisely what ran, including retries.
+
+The reviewed-run orchestration and result taxonomy are implemented. It runs the
+head first and uses the identical reviewed test at the base revision to
+distinguish an application regression from an already-outdated test. Connecting
+a production ephemeral sandbox and completing a credentialed integration
+exercise remain deployment work.
 
 ## 4. Publish test changes through draft PRs
 

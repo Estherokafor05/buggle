@@ -33,6 +33,7 @@ flowchart TD
 | `src/model.ts` | Structured AI proposals and conservative proposal lint |
 | `src/worker.ts` | Workflow decisions and stale-commit checks |
 | `src/local.ts` | Read-only local repository inspection |
+| `src/runner.ts` | Reviewed browser-run orchestration, evidence and base/head failure classification |
 | `src/config.ts` | Validated deployment configuration |
 | `scripts/demo.ts` | Credential-free deterministic demonstration |
 
@@ -47,6 +48,16 @@ obvious changed expectation but cannot prove that behaviour is correct or that
 all assertions are preserved. Human review remains mandatory, including when
 those checks succeed. A later executor must treat all generated code as
 untrusted and use an isolated environment without model or write credentials.
+
+Browser execution is a separate trust domain represented by `RevisionSandbox`.
+The webhook/model process never invokes repository code. The adapter creates an
+ephemeral environment at the requested revision, applies only human-reviewed
+test files, uses reviewed install and test argument vectors, and returns artifact
+paths rather than artifact contents. Reports retain exit status, retries,
+Playwright report, traces, screenshots and the exact revision. If head fails,
+the orchestrator runs the unchanged reviewed test at base: pass-at-base means
+`application_failure`, while identical failures at both revisions mean
+`outdated_tests`. Missing evidence remains `inconclusive`.
 
 Repository files can influence test style and provide evidence of requirements;
 they cannot expand the service's permissions. Source files named as common
